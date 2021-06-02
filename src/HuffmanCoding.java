@@ -52,6 +52,20 @@ public class HuffmanCoding {
      * This would be a good place to compute and store the tree.
      */
     public static Map<Character, String> constructTree(String text) {
+//        Step 1: determine the frequency of each character in the text.
+//        Set up the Node Class with int frequency initialised to -1
+//        convert text to char array
+
+        char[] T = text.toCharArray(); //text as char
+
+        int tLength = T.length; // T
+//        the total number of characters and spaces in the text
+
+//        for each character in  text from i = 0 to text.length
+//        , if frequ <=0, sum the number of occurrences and store
+//        until the end of the text
+//
+
         // TODO Construct the ACTUAL HuffmanTree here to use with both encode and decode below.
         // TODO fill this in.
         return new HashMap<Character, String>();
