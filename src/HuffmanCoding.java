@@ -48,6 +48,7 @@ public class HuffmanCoding {
     // TODO add a field with your ACTUAL HuffmanTree implementation.
     private static Object tree; // Change type from Object to HuffmanTree or appropriate type you design.
 
+
     /**
      * This would be a good place to compute and store the tree.
      */
@@ -57,9 +58,18 @@ public class HuffmanCoding {
 //        convert text to char array
 
         char[] T = text.toCharArray(); //text as char
-
         int tLength = T.length; // T
-//        the total number of characters and spaces in the text
+        int cFreq = 0;
+        HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
+        for (char c : T){
+            cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) +1 );
+        }
+        System.out.println("Character map size " + cFreqMap.size());
+        cFreqMap.entrySet().forEach(entry -> {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        });
+
+        //        the total number of characters and spaces in the text
 
 //        for each character in  text from i = 0 to text.length
 //        , if frequ <=0, sum the number of occurrences and store
