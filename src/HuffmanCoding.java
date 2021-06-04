@@ -80,6 +80,17 @@ public class HuffmanCoding {
             }
         }
         );
+ int[] priority2 = new int[63];
+ priority2[0] = 32; // space
+ for (int i = 0; i < 26; i++) {
+     priority2[i + 1] = 97 + i; // lowercase ascii 97 - 122 97 + 25 = 122 in places 1-26
+     priority2[i + 27] = 65 + i; // uppercase ascii 65 - 90 in places 26 to 51
+ }
+// not quite there with the upper case characters
+for (int i = 0; i < 10; i++) {
+    priority2[53 + i] = 48 + i; // 0-9 ascii 48 - 57 and 7 left over
+}
+System.out.println(Arrays.toString(priority2));
 
 // comment out the newline characters "+ \n"
         //        the total number of characters and spaces in the text
