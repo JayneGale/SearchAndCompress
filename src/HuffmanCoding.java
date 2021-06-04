@@ -61,14 +61,27 @@ public class HuffmanCoding {
         int tLength = T.length; // T
         int cFreq = 0;
         HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
-        for (char c : T){
-            cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) +1 );
+        int totalChar = 0;
+        for (char c : T) {
+            int charAscii = (int) c;
+            if (c != 10) {
+                cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) + 1);
+                totalChar +=1;
+            }
         }
-        System.out.println("Character map size " + cFreqMap.size());
+        System.out.println("Character map size " + cFreqMap.size() + " total " + totalChar);
+        float finalTotalChar = (float)totalChar;
         cFreqMap.entrySet().forEach(entry -> {
-            System.out.println(entry.getKey() + " " + entry.getValue());
-        });
+            int charAscii = (int)entry.getKey();
+            if (charAscii != 10){
+//                cFreqMap.put(entry.getKey(), );
+                float freq = entry.getValue()/ finalTotalChar;
+                System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
+            }
+        }
+        );
 
+// comment out the newline characters "+ \n"
         //        the total number of characters and spaces in the text
 
 //        for each character in  text from i = 0 to text.length
