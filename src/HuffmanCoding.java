@@ -60,36 +60,43 @@ public class HuffmanCoding {
         char[] T = text.toCharArray(); //text as char
         int tLength = T.length; // T
         int cFreq = 0;
+//        create method for finding frequency within the text and number of unique characters != control characters
         HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
-        int totalChar = 0;
+        int totalChars = 0;
         for (char c : T) {
-            int charAscii = (int) c;
-            if (c != 10) {
+//          char in Ascii = (int) c;
+            if ((int)c > 32) {
                 cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) + 1);
-                totalChar +=1;
+                totalChars += 1;
             }
         }
-        System.out.println("Character map size " + cFreqMap.size() + " total " + totalChar);
-        float finalTotalChar = (float)totalChar;
+
+        System.out.println("Character map size " + cFreqMap.size() + " total " + totalChars);
+        float finalTotalChars = (float)totalChars;
         cFreqMap.entrySet().forEach(entry -> {
             int charAscii = (int)entry.getKey();
-            if (charAscii != 10){
-//                cFreqMap.put(entry.getKey(), );
-                float freq = entry.getValue()/ finalTotalChar;
+                float freq = entry.getValue()/ finalTotalChars;
                 System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
-            }
         }
         );
- int[] priority2 = new int[63];
+
+//        create the second priority - make a method that returns an ordered array
+ int[] priority2 = new int[cFreqMap.size() + 63];
  priority2[0] = 32; // space
  for (int i = 0; i < 26; i++) {
      priority2[i + 1] = 97 + i; // lowercase ascii 97 - 122 97 + 25 = 122 in places 1-26
      priority2[i + 27] = 65 + i; // uppercase ascii 65 - 90 in places 26 to 51
  }
-// not quite there with the upper case characters
 for (int i = 0; i < 10; i++) {
-    priority2[53 + i] = 48 + i; // 0-9 ascii 48 - 57 and 7 left over
+    priority2[53 + i] = 48 + i; // 0-9 ascii 48 - 57
 }
+//todo up to here finding if array contains and what its index is
+
+//        To check if an element is in an array,
+//        first convert  array to ArrayList using asList()
+//        then apply the  contains() method to it.
+
+        int index = Ints.indexOf(priority2, 67);
 System.out.println(Arrays.toString(priority2));
 
 // comment out the newline characters "+ \n"
