@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import java.util.*;
 import java.io.*;
 
@@ -62,9 +64,14 @@ public class HuffmanCoding {
         int cFreq = 0;
 //        create method for finding frequency within the text and number of unique characters != control characters
         HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
+        HashMap<Character, Integer> cPriority2Map = new HashMap<Character, Integer>();
+
+//        for each character in  text from i = 0 to text.length
+//        , if frequ <=0, sum the number of occurrences and store
+//        until the end of the text
         int totalChars = 0;
         for (char c : T) {
-//          char in Ascii = (int) c;
+//            ignore first 31 Ascii control characters
             if ((int)c > 32) {
                 cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) + 1);
                 totalChars += 1;
@@ -73,38 +80,63 @@ public class HuffmanCoding {
 
         System.out.println("Character map size " + cFreqMap.size() + " total " + totalChars);
         float finalTotalChars = (float)totalChars;
-        cFreqMap.entrySet().forEach(entry -> {
-            int charAscii = (int)entry.getKey();
-                float freq = entry.getValue()/ finalTotalChars;
-                System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
+        PriorityQueue<NodeHuff> forest = new PriorityQueue<NodeHuff>(cFreqMap.size());
+// create the node
+        for (Map.Entry<Character, Integer> entry : cFreqMap.entrySet()) {
+            char ch = entry.getKey();
+            int charAscii = (int) ch;
+            cPriority2Map.put(ch, charAscii);
+            float freq = entry.getValue() / finalTotalChars;
+            int priority2;
+            if (charAscii < 32) break; // ignore control characters
+            if (charAscii == 32) priority2 = 0;
+            else if (charAscii >= 97 && charAscii <= 122) priority2 = 1 + charAscii - 97; // lowercase characters first
+            else if (charAscii >= 65 && charAscii <= 90) priority2 = 27 + charAscii - 65; // uppercase characters next
+            else if (charAscii >= 48 && charAscii <= 58) priority2 = 53 + charAscii - 48; // digits next
+            else priority2 = 63 + charAscii; // punctuation after that
+            NodeHuff c = new NodeHuff(ch, entry.getValue(), priority2, null, null, null);
+            forest.add(c);
+            System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
         }
-        );
+        System.out.println(forest.size());
+//TODO        Now give the priority queue its priorities
+
 
 //        create the second priority - make a method that returns an ordered array
- int[] priority2 = new int[cFreqMap.size() + 63];
- priority2[0] = 32; // space
+        char c = 'a';
+        int charAscii = (int)c;
+        int priority2 = 10000;
+        Priority2 charPriority = null;
+        switch(charPriority){
+            case space:
+                priority2 = 0;
+                break;
+            case lowercase:
+                priority2 = 1 + (int)charAscii - 97;
+                break;
+            case uppercase:
+                priority2 = 27 + (int)charAscii - 65;
+                break;
+            case digit:
+                priority2 = 53 + (int)charAscii - 48;
+                break;
+            case other:
+                break;
+            case control:
+                System.err.println("control character");
+                break;
+        }
+ int[] priorityarr2 = new int[cFreqMap.size() + 63];
+ priorityarr2[0] = 32; // space
  for (int i = 0; i < 26; i++) {
-     priority2[i + 1] = 97 + i; // lowercase ascii 97 - 122 97 + 25 = 122 in places 1-26
-     priority2[i + 27] = 65 + i; // uppercase ascii 65 - 90 in places 26 to 51
+     priorityarr2[i + 1] = 97 + i; // lowercase ascii 97 - 122 97 + 25 = 122 in places 1-26
+     priorityarr2[i + 27] = 65 + i; // uppercase ascii 65 - 90 in places 26 to 51
  }
 for (int i = 0; i < 10; i++) {
-    priority2[53 + i] = 48 + i; // 0-9 ascii 48 - 57
+    priorityarr2[53 + i] = 48 + i; // 0-9 ascii 48 - 57
 }
-//todo up to here finding if array contains and what its index is
+System.out.println(Arrays.toString(priorityarr2));
 
-//        To check if an element is in an array,
-//        first convert  array to ArrayList using asList()
-//        then apply the  contains() method to it.
-
-        int index = Ints.indexOf(priority2, 67);
-System.out.println(Arrays.toString(priority2));
-
-// comment out the newline characters "+ \n"
-        //        the total number of characters and spaces in the text
-
-//        for each character in  text from i = 0 to text.length
-//        , if frequ <=0, sum the number of occurrences and store
-//        until the end of the text
 //
 
         // TODO Construct the ACTUAL HuffmanTree here to use with both encode and decode below.
