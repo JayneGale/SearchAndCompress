@@ -1,8 +1,6 @@
-import org.w3c.dom.Node;
-
 import java.util.*;
 import java.io.*;
-
+import java.util.PriorityQueue;
 /**
  * A new instance of HuffmanCoding is created for every run. The constructor is
  * passed the full text to be encoded or decoded, so this is a good place to
@@ -64,82 +62,65 @@ public class HuffmanCoding {
         int cFreq = 0;
 //        create method for finding frequency within the text and number of unique characters != control characters
         HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
-        HashMap<Character, Integer> cPriority2Map = new HashMap<Character, Integer>();
+        HashMap<Character, Integer> alphOrderMap = new HashMap<Character, Integer>();
 
 //        for each character in  text from i = 0 to text.length
-//        , if frequ <=0, sum the number of occurrences and store
+//        if frequ <=0, start counting; sum the number of occurrences and store
 //        until the end of the text
         int totalChars = 0;
         for (char c : T) {
 //            ignore first 31 Ascii control characters
-            if ((int)c > 32) {
+            if ((int)c > 31) {
                 cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) + 1);
                 totalChars += 1;
             }
         }
 
-        System.out.println("Character map size " + cFreqMap.size() + " total " + totalChars);
-        float finalTotalChars = (float)totalChars;
-        PriorityQueue<NodeHuff> forest = new PriorityQueue<NodeHuff>(cFreqMap.size());
-// create the node
+        System.out.println("Character map size " + cFreqMap.size() + " total chars in text " + totalChars);
+//        float finalTotalChars = (float)totalChars; // float to make division easier
+        PriorityQueue<NodeHuff> forest = new PriorityQueue<>(cFreqMap.size(), new FreqComparator());
+    //        create the second alphabetical priority based on ascii codes
+    //        create the Leaf nodes that contain a character
+
         for (Map.Entry<Character, Integer> entry : cFreqMap.entrySet()) {
             char ch = entry.getKey();
             int charAscii = (int) ch;
-            cPriority2Map.put(ch, charAscii);
-            float freq = entry.getValue() / finalTotalChars;
-            int priority2;
-            if (charAscii < 32) break; // ignore control characters
-            if (charAscii == 32) priority2 = 0;
-            else if (charAscii >= 97 && charAscii <= 122) priority2 = 1 + charAscii - 97; // lowercase characters first
-            else if (charAscii >= 65 && charAscii <= 90) priority2 = 27 + charAscii - 65; // uppercase characters next
-            else if (charAscii >= 48 && charAscii <= 58) priority2 = 53 + charAscii - 48; // digits next
-            else priority2 = 63 + charAscii; // punctuation after that
-            NodeHuff c = new NodeHuff(ch, entry.getValue(), priority2, null, null, null);
+            alphOrderMap.put(ch, charAscii);
+            float freq = entry.getValue();
+            int alphPriority;
+            if (charAscii < 32 || charAscii == 127) break; // ignore control characters
+            else if (charAscii == 32) alphPriority = 0;
+            else if (charAscii >= 97 && charAscii <= 122) alphPriority = charAscii - 96; //  charAscii + 1 - 97; // lowercase characters first
+            else if (charAscii >= 65 && charAscii <= 90) alphPriority = charAscii - 38; // charAscii + 26 + 1 - 65; uppercase characters next
+            else if (charAscii >= 48 && charAscii <= 58) alphPriority = charAscii - 5; // charAscii 53 (10 + 26 + 26 + 1) - 48 digits next +
+            else alphPriority = charAscii + 31 ; // 63 (10 + 26 + 26 + 1) - 32 punctuation after that
+            NodeHuff c = new NodeHuff(ch, entry.getValue(), alphPriority, null, null, null, true);
             forest.add(c);
             System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
         }
-        System.out.println(forest.size());
-//TODO        Now give the priority queue its priorities
-
-
-//        create the second priority - make a method that returns an ordered array
-        char c = 'a';
-        int charAscii = (int)c;
-        int priority2 = 10000;
-        Priority2 charPriority = null;
-        switch(charPriority){
-            case space:
-                priority2 = 0;
-                break;
-            case lowercase:
-                priority2 = 1 + (int)charAscii - 97;
-                break;
-            case uppercase:
-                priority2 = 27 + (int)charAscii - 65;
-                break;
-            case digit:
-                priority2 = 53 + (int)charAscii - 48;
-                break;
-            case other:
-                break;
-            case control:
-                System.err.println("control character");
-                break;
+        for (NodeHuff n : forest){
+            System.out.println(n.n + " freq " + n.frequency + " alph order " + n.orderPriority);
         }
- int[] priorityarr2 = new int[cFreqMap.size() + 63];
- priorityarr2[0] = 32; // space
- for (int i = 0; i < 26; i++) {
-     priorityarr2[i + 1] = 97 + i; // lowercase ascii 97 - 122 97 + 25 = 122 in places 1-26
-     priorityarr2[i + 27] = 65 + i; // uppercase ascii 65 - 90 in places 26 to 51
- }
-for (int i = 0; i < 10; i++) {
-    priorityarr2[53 + i] = 48 + i; // 0-9 ascii 48 - 57
-}
-System.out.println(Arrays.toString(priorityarr2));
+        System.out.println(forest.size() + " peek " + forest.peek().n);
+//        Step 1:
+//        Create a new NodeHuff
+//        - the lowest priority node is childRight
+//        - the second lowest priority node is childLeft
+        while(forest.size()>1){
+            NodeHuff lowestNode = forest.poll();
+            NodeHuff secondNode = forest.poll();
+            NodeHuff joinedNode = new NodeHuff(lowestNode.n, (lowestNode.frequency + secondNode.frequency), lowestNode.orderPriority, null, secondNode, lowestNode, false);
+            lowestNode.parent = joinedNode;
+            secondNode.parent = joinedNode;
+            forest.add(joinedNode);
+            System.out.println(joinedNode.n + "freq "  + joinedNode.frequency + " order "+ joinedNode.orderPriority + " left " + joinedNode.childLeft.n + " right " + joinedNode.childRight.n);
+        }
 
-//
+
+
 
         // TODO Construct the ACTUAL HuffmanTree here to use with both encode and decode below.
+
         // TODO fill this in.
         return new HashMap<Character, String>();
     }
