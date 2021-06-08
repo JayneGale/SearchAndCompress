@@ -45,9 +45,7 @@ public class HuffmanCoding {
         }
     }
 
-    // TODO add a field with your ACTUAL HuffmanTree implementation.
     private static Object tree; // Change type from Object to HuffmanTree or appropriate type you design.
-
 
     /**
      * This would be a good place to compute and store the tree.
@@ -65,12 +63,11 @@ public class HuffmanCoding {
         HashMap<Character, Integer> alphOrderMap = new HashMap<Character, Integer>();
 
 //        for each character in  text from i = 0 to text.length
-//        if frequ <=0, start counting; sum the number of occurrences and store
-//        until the end of the text
+//        if freq <=0, start counting; sum the number of occurrences and store
         int totalChars = 0;
         for (char c : T) {
-//            ignore first 31 Ascii control characters
-            if ((int)c > 31) {
+//            ignore first 30 Ascii control characters (keep /n)
+            if ((int)c > 30) {
                 cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) + 1);
                 totalChars += 1;
             }
@@ -79,52 +76,91 @@ public class HuffmanCoding {
         System.out.println("Character map size " + cFreqMap.size() + " total chars in text " + totalChars);
 //        float finalTotalChars = (float)totalChars; // float to make division easier
         PriorityQueue<NodeHuff> forest = new PriorityQueue<>(cFreqMap.size(), new FreqComparator());
-    //        create the second alphabetical priority based on ascii codes
-    //        create the Leaf nodes that contain a character
 
         for (Map.Entry<Character, Integer> entry : cFreqMap.entrySet()) {
-            char ch = entry.getKey();
-            int charAscii = (int) ch;
-            alphOrderMap.put(ch, charAscii);
             float freq = entry.getValue();
-            int alphPriority;
-            if (charAscii < 32 || charAscii == 127) break; // ignore control characters
-            else if (charAscii == 32) alphPriority = 0;
-            else if (charAscii >= 97 && charAscii <= 122) alphPriority = charAscii - 96; //  charAscii + 1 - 97; // lowercase characters first
-            else if (charAscii >= 65 && charAscii <= 90) alphPriority = charAscii - 38; // charAscii + 26 + 1 - 65; uppercase characters next
-            else if (charAscii >= 48 && charAscii <= 58) alphPriority = charAscii - 5; // charAscii 53 (10 + 26 + 26 + 1) - 48 digits next +
-            else alphPriority = charAscii + 31 ; // 63 (10 + 26 + 26 + 1) - 32 punctuation after that
-            NodeHuff c = new NodeHuff(ch, entry.getValue(), alphPriority, null, null, null, true);
+
+            //        create the second (alphabet) priority based on ascii codes
+            int charAscii = (int) entry.getKey();
+            if (charAscii < 31 || charAscii == 127) break; // ignore control characters except newline
+            int alphPriority = setAlphabetPriority(charAscii);
+
+            //        create the Leaf nodes that contain a character
+            NodeHuff c = new NodeHuff(entry.getKey(), entry.getValue(), alphPriority, null, null, null, true);
             forest.add(c);
-            System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
+//            System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
         }
         for (NodeHuff n : forest){
-            System.out.println(n.n + " freq " + n.frequency + " alph order " + n.orderPriority);
+            System.out.println("Start " + (int)n.n + " char " + n.n + " freq " + n.frequency + " alph order " + n.orderPriority);
         }
-        System.out.println(forest.size() + " peek " + forest.peek().n);
+
+//        char firstValue = '音';
+//        char secondValue = '之';
+//// compare the first char to the second
+//        int compareOneTwo = Character.compare(firstValue, secondValue);
+//        if (compareOneTwo> 0) { "First value is greater than second value");}
+//        else {("First value is less than second value.");}
+
 //        Step 1:
 //        Create a new NodeHuff
-//        - the lowest priority node is childRight
-//        - the second lowest priority node is childLeft
+//        - the lowest priority node is childLeft
+//        - the second lowest priority node is childRight
         while(forest.size()>1){
             NodeHuff lowestNode = forest.poll();
             NodeHuff secondNode = forest.poll();
-            NodeHuff joinedNode = new NodeHuff(lowestNode.n, (lowestNode.frequency + secondNode.frequency), lowestNode.orderPriority, null, secondNode, lowestNode, false);
+            NodeHuff joinedNode = new NodeHuff(lowestNode.n, (lowestNode.frequency + secondNode.frequency), lowestNode.orderPriority, null, lowestNode, secondNode, false);
             lowestNode.parent = joinedNode;
             secondNode.parent = joinedNode;
             forest.add(joinedNode);
-            System.out.println(joinedNode.n + "freq "  + joinedNode.frequency + " order "+ joinedNode.orderPriority + " left " + joinedNode.childLeft.n + " right " + joinedNode.childRight.n);
+            System.out.println("Joined left " + joinedNode.childLeft.n + " right " + joinedNode.childRight.n + " joined freq "  + joinedNode.frequency + " 2nd order " + joinedNode.orderPriority + "least alph " + joinedNode.n  );
         }
+        ArrayList<NodeHuff> HuffTree = new ArrayList<>();
+        String Left;
 
-
-
+            NodeHuff root = forest.poll();
+            root.biCode = "";
+            System.out.println("root smallest char " + root.n + " root freq " + root.frequency + " alph order " + root.orderPriority + " left " +  root.childLeft.n+  " right " + root.childRight.n + " parent " + root.parent + " isLeaf " + root.isLeaf);
+            HashMap<Character, String> encoding = new HashMap<>();
+            encoding = iterTree(root, encoding);
+            for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+                System.out.println("tree key " + entry.getKey() + " value " + entry.getValue());
+            }
 
         // TODO Construct the ACTUAL HuffmanTree here to use with both encode and decode below.
-
-        // TODO fill this in.
-        return new HashMap<Character, String>();
+        return encoding;
     }
-    
+
+    private static HashMap<Character, String> iterTree(NodeHuff n, HashMap<Character, String> encoding) {
+        if (n.childLeft == null) return encoding;
+        NodeHuff left = n.childLeft;
+        if (n.childRight == null) return encoding;
+        NodeHuff right = n.childRight;
+        left.biCode = n.biCode + "0";
+        right.biCode = n.biCode + "1";
+        System.out.println("start ifs " + " n value " + n.n + " n biCode " + n.biCode + " isLeaf " + n.isLeaf);
+        if (left.isLeaf){ encoding.put(left.n, left.biCode);
+            System.out.println("tree " + left.n + " left value " + encoding.get(left.n) + " isLeaf " + left.isLeaf);
+            return encoding;
+        }
+        encoding  = iterTree(left, encoding);
+        if (right.isLeaf){ encoding.put(right.n, right.biCode);
+            System.out.println("tree " + right.n + " right value " + encoding.get(right.n) + " isLeaf " + right.isLeaf);
+            return encoding;
+        }
+        encoding  = iterTree(right, encoding);
+        return encoding;
+    }
+
+    private static int setAlphabetPriority(int charAscii) {
+        int alphPriority;
+        if (charAscii == 32) alphPriority = 0;
+        else if (charAscii >= 97 && charAscii <= 122) alphPriority = charAscii - 96; //  charAscii + 1 - 97; // lowercase characters first
+        else if (charAscii >= 65 && charAscii <= 90) alphPriority = charAscii - 38; // charAscii + 26 + 1 - 65; uppercase characters next
+        else if (charAscii >= 48 && charAscii <= 58) alphPriority = charAscii - 5; // charAscii 53 (10 + 26 + 26 + 1) - 48 digits next +
+        else alphPriority = charAscii + 31 ; // 63 (10 + 26 + 26 + 1) - 32 punctuation after that
+        return alphPriority;
+    }
+
     /**
      * Take an input string, text, and encode it with the tree computed from the text. Should
      * return the encoded text as a binary string, that is, a string containing

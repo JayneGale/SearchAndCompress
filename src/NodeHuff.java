@@ -5,6 +5,7 @@ public class NodeHuff {
     Boolean isLeaf = true;
     NodeHuff childLeft, childRight; // oh wait these should be binary codes
     NodeHuff parent; //
+    String biCode = "";
 
 //    the Node Object class for the forest to create the Huffman tree
     public NodeHuff(char n, int frequency, int orderPriority, NodeHuff parent, NodeHuff childLeft, NodeHuff childRight, boolean isLeaf) {
