@@ -131,9 +131,7 @@ public class HuffmanCoding {
     }
 
     private static HashMap<Character, String> iterTree(NodeHuff n, HashMap<Character, String> encoding) {
-        if (n.childLeft == null) return encoding;
         NodeHuff left = n.childLeft;
-        if (n.childRight == null) return encoding;
         NodeHuff right = n.childRight;
         left.biCode = n.biCode + "0";
         right.biCode = n.biCode + "1";
@@ -157,7 +155,7 @@ public class HuffmanCoding {
         else if (charAscii >= 97 && charAscii <= 122) alphPriority = charAscii - 96; //  charAscii + 1 - 97; // lowercase characters first
         else if (charAscii >= 65 && charAscii <= 90) alphPriority = charAscii - 38; // charAscii + 26 + 1 - 65; uppercase characters next
         else if (charAscii >= 48 && charAscii <= 58) alphPriority = charAscii - 5; // charAscii 53 (10 + 26 + 26 + 1) - 48 digits next +
-        else alphPriority = charAscii + 31 ; // 63 (10 + 26 + 26 + 1) - 32 punctuation after that
+        else alphPriority = charAscii + 33 ; // 63 (10 + 26 + 26 + 1) - 30 punctuation after that
         return alphPriority;
     }
 
