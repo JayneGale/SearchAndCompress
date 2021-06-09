@@ -3,8 +3,8 @@ public class NodeHuff {
     int orderPriority = -1;
     char n;
     Boolean isLeaf = true;
-    NodeHuff childLeft, childRight; // oh wait these should be binary codes
-    NodeHuff parent; //
+    NodeHuff childLeft, childRight;
+    NodeHuff parent;
     String biCode = "";
 
 //    the Node Object class for the forest to create the Huffman tree
