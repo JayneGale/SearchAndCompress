@@ -1,1 +1,1 @@
-AABBCCDD
+A string I made up
