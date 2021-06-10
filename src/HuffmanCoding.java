@@ -1,3 +1,5 @@
+import org.w3c.dom.Node;
+
 import java.util.*;
 import java.io.*;
 import java.util.PriorityQueue;
@@ -34,6 +36,7 @@ public class HuffmanCoding {
                     System.out.println(encode(fileText.toString()));
                 } else if (args[1].equals("2")) {
                     constructTree(fileText.toString()); // initialises the tree field.
+//                    tree = constructTree(fileText.toString());
                     encoding = constructTree(fileText.toString());
                     String codedText = encode(fileText.toString());
                     // DO NOT just change this code to simply print fileText.toString() back. ;-)
@@ -48,13 +51,13 @@ public class HuffmanCoding {
 
     }
 
-    private static Object tree; // Change type from Object to HuffmanTree or appropriate type you design.
+    private static HuffTree tree; // Change type from Object to HuffmanTree or appropriate type you design.
     /**
      * This would be a good place to compute and store the tree.
      */
 
     private static Map<Character, String> encoding;
-    private static Map<String, Character> decoding = new HashMap<>();
+    private static final Map<String, Character> decoding = new HashMap<>();
 
     public static Map<Character, String> constructTree(String text) {
 //        Step 1: determine the frequency of each character in the text.
@@ -74,9 +77,7 @@ public class HuffmanCoding {
             totalChars += 1;
         }
 
-//        System.out.println("Character map size " + cFreqMap.size() + " total chars in text " + totalChars);
         PriorityQueue<NodeHuff> forest = new PriorityQueue<>(cFreqMap.size(), new FreqComparator());
-
         for (Map.Entry<Character, Integer> entry : cFreqMap.entrySet()) {
             //        create the second (alphabet) priority based on ascii codes
             int charAscii = (int) entry.getKey();
@@ -88,12 +89,7 @@ public class HuffmanCoding {
             forest.add(c);
 //            System.out.println(charAscii + " " + entry.getKey() + " " + entry.getValue() + " freq " + freq);
         }
-//        for (NodeHuff n : forest){
-//            System.out.println("Start " + (int)n.n + " char " + n.n + " freq " + n.frequency + " alph order " + n.orderPriority);
-//        }
 
-//        char firstValue = '音';
-//        char secondValue = '之';
 //// compare the first char to the second
 //        int compareOneTwo = Character.compare(firstValue, secondValue);
 //        if (compareOneTwo> 0) { "First value is greater than second value");}
@@ -118,20 +114,16 @@ public class HuffmanCoding {
 //            System.out.println("Joined left " + joinedNode.childLeft.n + " right " + joinedNode.childRight.n + " joined freq "  + joinedNode.frequency + " 2nd order " + joinedNode.orderPriority + "least alph " + joinedNode.n  );
         }
         NodeHuff root = forest.poll();
-//      now work out the binary code from the root
-//      - each child node, add 0 for a left child and a 1 for a right child
         root.addBiCode("");
-//        System.out.println(root.biCode);
-//        root.biCode = "";
+        HuffTree.setRoot(root);
+//      now set the binary code from the root
+//      - each child node, add 0 for a left child and a 1 for a right child
 //      System.out.println("root smallest char " + root.n + " root freq " + root.frequency + " alph order " + root.orderPriority + " left " +  root.childLeft.n+  " right " + root.childRight.n + " parent " + root.parent + " isLeaf " + root.isLeaf);
         Map<Character, String> encoding = new HashMap<>();
         encoding = iterTree(root, encoding);
-//            for (Map.Entry<Character, String> entry : encoding.entrySet()) {
 //                System.out.println("tree key " + entry.getKey() + " value " + entry.getValue());
-//            }
 //                System.out.println("encoding size " + encoding.size());
-        return encoding;
-    }
+        return encoding;  }
 
     private static Map<Character, String> iterTree(NodeHuff n, Map<Character, String> encoding) {
         NodeHuff left = n.childLeft;
@@ -181,32 +173,25 @@ public class HuffmanCoding {
      * and return the decoded text as a text string.
      */
     public static String decode(String encoded) {
+
+//        tree.root = HuffTree.root;
         //        reverse the encoding Map to a decoding Map
         for (Map.Entry<Character, String> entry : encoding.entrySet()) {
             Character ch = (char)entry.getKey();
             String val = (String)entry.getValue();
-            System.out.println("Enc val " + val + " key "  + ch);
 
             //        create a second Map the reverse of the first
             decoding.put(val,ch);
         }
-        System.out.println("Encoding " + encoding.entrySet());
         System.out.println("Decoding " + decoding.entrySet());
-
-//        for (Map.Entry<String,Character> entry : decoding.entrySet()) {
-//            System.out.println("Decoding " + decoding.entrySet());
-//            }
-
         String codedString = "";
         StringBuilder decodedText = new StringBuilder();
         char[] E = encoded.toCharArray();
         for(char c : E){
             String ch = Character.toString(c);
             codedString += ch;
-//            System.out.println("codedString " + codedString + "ch " + ch);
             if (encoding.containsValue(codedString)){
                 String t = Character.toString(decoding.get(codedString));
-//                System.out.println("t " + t);
                 decodedText.append(t);
                 codedString = "";
             }
