@@ -55,7 +55,7 @@ public class HuffmanCoding {
      * This would be a good place to compute and store the tree.
      */
     private static HuffTree tree = new HuffTree(); // Change type from Object to HuffmanTree or appropriate type you design.
-//    private static Map<Character, String> encoding = new HashMap<>();
+    private static Map<Character, String> encoding = new HashMap<>();
 //    private static final Map<String, Character> decoding = new HashMap<>();
 
     public static HuffTree constructTree(String text) {
@@ -111,26 +111,26 @@ public class HuffmanCoding {
 //      now set the binary code from the root
 //      - each child node, add 0 for a left child and a 1 for a right child
 //      System.out.println("root smallest char " + root.n + " root freq " + root.frequency + " alph order " + root.orderPriority + " left " +  root.childLeft.n+  " right " + root.childRight.n + " parent " + root.parent + " isLeaf " + root.isLeaf);
-        Map<Character, String> encoding = new HashMap<>();
-        encoding = iterTree(root, encoding);
+//        Map<Character, String> encoding = new HashMap<>();
+        encoding = iterTree(tree.root);
 //                System.out.println("tree key " + entry.getKey() + " value " + entry.getValue());
         System.out.println("encoding size " + encoding.size());
         return tree;  }
 
-    private static Map<Character, String> iterTree(NodeHuff n, Map<Character, String> encoding) {
+    private static Map<Character, String> iterTree(NodeHuff n) {
         NodeHuff left = n.childLeft;
         NodeHuff right = n.childRight;
         left.biCode = n.biCode + "0";
         right.biCode = n.biCode + "1";
         if(!left.isLeaf){
-            encoding = iterTree(left, encoding); }
+            encoding = iterTree(left); }
         else { encoding.put(left.n, left.biCode);
-//            System.out.println("tree " + left.n + " left value " + encoding.get(left.n) + " isLeaf " + left.isLeaf);
+            System.out.println("tree " + left.n + " left value " + encoding.get(left.n) + " isLeaf " + left.isLeaf);
         }
         if(!right.isLeaf){
-            encoding  = iterTree(right, encoding); }
+            encoding  = iterTree(right); }
         else { encoding.put(right.n, right.biCode);
-//            System.out.println("tree " + right.n + " right value " + encoding.get(right.n) + " isLeaf " + right.isLeaf);
+            System.out.println("tree " + right.n + " right value " + encoding.get(right.n) + " isLeaf " + right.isLeaf);
         }
         return encoding;
     }
@@ -153,9 +153,11 @@ public class HuffmanCoding {
     public static String encode(String text) {
 //        Map<Character, String> encoding = constructTree(text);
         System.out.println(text);
+        System.out.println("tree.root.childRight.childRight " + tree.root.childRight.childRight.n + " right value " + encoding.get(tree.root.childRight.n) + " isLeaf " + tree.root.childRight.isLeaf);
 
         char[] T = text.toCharArray();
         String code = "";
+
 
 //        for(char c : T){code = code + encoding.get(c); }
         System.out.println(code);
@@ -192,6 +194,20 @@ public class HuffmanCoding {
         char zeroOne;
         NodeHuff node = tree.root;
         System.out.println("Node root " + node.n + " binary code " + node.biCode + node.isLeaf);
+
+//        node <- root
+//        index <- 0
+//        while index < input.length:
+//        if input[index] == '0':
+//        node <- node.left
+//    else if input[index] == '1':
+//        node <- node.right
+//        if node is a leaf node:
+//        output node.character
+//        node <- root
+//        index++
+
+
         for (int i = 0; i < E.length; i++){
             zeroOne = E[i];
             System.out.println("Character in code " + zeroOne);
