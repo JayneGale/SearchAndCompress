@@ -23,4 +23,7 @@ public class NodeHuff {
     public int getOrderPriority(){
         return orderPriority;
     }
+    public void addBiCode(String codeToAdd){
+        biCode = codeToAdd;
+    }
 }

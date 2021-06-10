@@ -1,1 +1,1 @@
-AABBCCDD
+Here is a test of the Huffman Coding tree I made up

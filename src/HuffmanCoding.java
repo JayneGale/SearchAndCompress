@@ -1,6 +1,7 @@
 import java.util.*;
 import java.io.*;
 import java.util.PriorityQueue;
+
 /**
  * A new instance of HuffmanCoding is created for every run. The constructor is
  * passed the full text to be encoded or decoded, so this is a good place to
@@ -33,8 +34,9 @@ public class HuffmanCoding {
                     System.out.println(encode(fileText.toString()));
                 } else if (args[1].equals("2")) {
                     constructTree(fileText.toString()); // initialises the tree field.
+                    encoding = constructTree(fileText.toString());
                     String codedText = encode(fileText.toString());
-                     // DO NOT just change this code to simply print fileText.toString() back. ;-)
+                    // DO NOT just change this code to simply print fileText.toString() back. ;-)
                     System.out.println(decode(codedText));
                 } else {
                     System.out.println("Unknown second argument: should be 0 or 1 or 2");
@@ -51,6 +53,8 @@ public class HuffmanCoding {
      * This would be a good place to compute and store the tree.
      */
 
+    private static Map<Character, String> encoding;
+    private static Map<String, Character> decoding = new HashMap<>();
 
     public static Map<Character, String> constructTree(String text) {
 //        Step 1: determine the frequency of each character in the text.
@@ -70,11 +74,10 @@ public class HuffmanCoding {
             totalChars += 1;
         }
 
-        System.out.println("Character map size " + cFreqMap.size() + " total chars in text " + totalChars);
+//        System.out.println("Character map size " + cFreqMap.size() + " total chars in text " + totalChars);
         PriorityQueue<NodeHuff> forest = new PriorityQueue<>(cFreqMap.size(), new FreqComparator());
 
         for (Map.Entry<Character, Integer> entry : cFreqMap.entrySet()) {
-
             //        create the second (alphabet) priority based on ascii codes
             int charAscii = (int) entry.getKey();
 //            if (charAscii < 31 || charAscii == 127) break; // ignore control characters except newline
@@ -117,14 +120,16 @@ public class HuffmanCoding {
         NodeHuff root = forest.poll();
 //      now work out the binary code from the root
 //      - each child node, add 0 for a left child and a 1 for a right child
-        root.biCode = "";
+        root.addBiCode("");
+//        System.out.println(root.biCode);
+//        root.biCode = "";
 //      System.out.println("root smallest char " + root.n + " root freq " + root.frequency + " alph order " + root.orderPriority + " left " +  root.childLeft.n+  " right " + root.childRight.n + " parent " + root.parent + " isLeaf " + root.isLeaf);
         Map<Character, String> encoding = new HashMap<>();
         encoding = iterTree(root, encoding);
 //            for (Map.Entry<Character, String> entry : encoding.entrySet()) {
 //                System.out.println("tree key " + entry.getKey() + " value " + entry.getValue());
 //            }
-                System.out.println("encoding size " + encoding.size());
+//                System.out.println("encoding size " + encoding.size());
         return encoding;
     }
 
@@ -134,14 +139,12 @@ public class HuffmanCoding {
         left.biCode = n.biCode + "0";
         right.biCode = n.biCode + "1";
         if(!left.isLeaf){
-            encoding = iterTree(left, encoding);
-        }
+            encoding = iterTree(left, encoding); }
         else { encoding.put(left.n, left.biCode);
 //            System.out.println("tree " + left.n + " left value " + encoding.get(left.n) + " isLeaf " + left.isLeaf);
         }
         if(!right.isLeaf){
-            encoding  = iterTree(right, encoding);
-        }
+            encoding  = iterTree(right, encoding); }
         else { encoding.put(right.n, right.biCode);
 //            System.out.println("tree " + right.n + " right value " + encoding.get(right.n) + " isLeaf " + right.isLeaf);
         }
@@ -178,8 +181,36 @@ public class HuffmanCoding {
      * and return the decoded text as a text string.
      */
     public static String decode(String encoded) {
+        //        reverse the encoding Map to a decoding Map
+        for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+            Character ch = (char)entry.getKey();
+            String val = (String)entry.getValue();
+            System.out.println("Enc val " + val + " key "  + ch);
 
-        // TODO fill this in.
-        return "";
+            //        create a second Map the reverse of the first
+            decoding.put(val,ch);
+        }
+        System.out.println("Encoding " + encoding.entrySet());
+        System.out.println("Decoding " + decoding.entrySet());
+
+//        for (Map.Entry<String,Character> entry : decoding.entrySet()) {
+//            System.out.println("Decoding " + decoding.entrySet());
+//            }
+
+        String codedString = "";
+        StringBuilder decodedText = new StringBuilder();
+        char[] E = encoded.toCharArray();
+        for(char c : E){
+            String ch = Character.toString(c);
+            codedString += ch;
+//            System.out.println("codedString " + codedString + "ch " + ch);
+            if (encoding.containsValue(codedString)){
+                String t = Character.toString(decoding.get(codedString));
+//                System.out.println("t " + t);
+                decodedText.append(t);
+                codedString = "";
+            }
+        }
+        return decodedText.toString();
     }
 }
