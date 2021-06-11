@@ -1,3 +1,5 @@
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.io.*;
 import java.util.PriorityQueue;
@@ -33,14 +35,16 @@ public class HuffmanCoding {
                     constructTree(fileText.toString()); // initialises the tree field.
                     System.out.println(encode(fileText.toString()));
                 } else if (args[1].equals("2")) {
+                    Instant start = Instant.now();
                     constructTree(fileText.toString()); // initialises the tree field.
-//                    tree = constructTree(fileText.toString());
-                    tree = constructTree(fileText.toString());
-
-//                    encoding = constructTree(fileText.toString());
                     String codedText = encode(fileText.toString());
                     // DO NOT just change this code to simply print fileText.toString() back. ;-)
                     System.out.println(decode(codedText));
+                    Instant end = Instant.now();
+                    Duration timeElapsed = Duration.between(start, end);
+                    double deltaT = (double) timeElapsed.toMillis() / 1000;
+                    System.out.println("Time taken: " + deltaT + " seconds");
+
                 } else {
                     System.out.println("Unknown second argument: should be 0 or 1 or 2");
                 }
@@ -64,25 +68,22 @@ public class HuffmanCoding {
 //        convert text to char array
         char[] T = text.toCharArray();
 
-        //        create method for finding frequency within the text and number of unique characters != control characters
+        //        create method for finding frequency within the text and number of unique characters
         HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
 
 //        for each character in  text
-//        if freq = default start at 0, else add to count; sum the number of occurrences and store in character frequency Map
-        int totalChars = 0;
+//        if freq = default start at 0, else add to count; store in character frequency Map
         for (char c : T) {
-//          Started off ignoring first 30 Ascii control characters (keep /n) if ((int)c > 30) {
             cFreqMap.put(c, cFreqMap.getOrDefault(c, 0) + 1);
-            totalChars += 1;
         }
 
         PriorityQueue<NodeHuff> forest = new PriorityQueue<>(cFreqMap.size(), new FreqComparator());
         for (Map.Entry<Character, Integer> entry : cFreqMap.entrySet()) {
-            //        create the second (alphabet) priority based on ascii codes
+//      Step 2         create the second (alphabet) priority based on ascii codes
             int charAscii = (int) entry.getKey();
 //            if (charAscii < 31 || charAscii == 127) break; // ignore control characters except newline
             int alphPriority = setAlphabetPriority(charAscii);
-            //        create the Leaf nodes that contain a character
+            //        create the Leaf nodes that contain a character and put each as a separate item in the forest of nodes
             NodeHuff c = new NodeHuff(entry.getKey(), entry.getValue(), alphPriority, null, null, null, true);
             forest.add(c);
         }
@@ -93,8 +94,8 @@ public class HuffmanCoding {
 //        - the second lowest priority node is childRight
 //        - freq = sum of the two child frequencies
 //        - isLeaf set to false
-//        - alphPriority set to the child char with top alphabet priority
-//        - remove the children and add the joined node back into the priority queue forest
+//        - alphPriority set to the child char that is chosen first in alphabet priority (lowest index)
+//        - remove the children from the forest (poll) and add the joined node back into the priority queue forest
 //        - continue until reach one (root) node left in the forest - all nodes are now in the tree
         while(forest.size()>1){
             NodeHuff lowestNode = forest.poll();
@@ -105,16 +106,14 @@ public class HuffmanCoding {
             forest.add(joinedNode);
 //            System.out.println("Joined left " + joinedNode.childLeft.n + " right " + joinedNode.childRight.n + " joined freq "  + joinedNode.frequency + " 2nd order " + joinedNode.orderPriority + "least alph " + joinedNode.n  );
         }
+//        the last element left is the root of the new tree with no code, no parent, and already has its 2 children and frequency
         NodeHuff root = forest.poll();
         root.addBiCode("");
         tree.root = root;
-//      now set the binary code from the root
+
+//      now set the binary code from the root and store the leaf values and code in a HashMap encoding
 //      - each child node, add 0 for a left child and a 1 for a right child
-//      System.out.println("root smallest char " + root.n + " root freq " + root.frequency + " alph order " + root.orderPriority + " left " +  root.childLeft.n+  " right " + root.childRight.n + " parent " + root.parent + " isLeaf " + root.isLeaf);
-//        Map<Character, String> encoding = new HashMap<>();
         encoding = iterTree(tree.root);
-//                System.out.println("tree key " + entry.getKey() + " value " + entry.getValue());
-        System.out.println("encoding size " + encoding.size());
         return tree;  }
 
     private static Map<Character, String> iterTree(NodeHuff n) {
@@ -125,12 +124,11 @@ public class HuffmanCoding {
         if(!left.isLeaf){
             encoding = iterTree(left); }
         else { encoding.put(left.n, left.biCode);
-            System.out.println("tree " + left.n + " left value " + encoding.get(left.n) + " isLeaf " + left.isLeaf);
         }
         if(!right.isLeaf){
             encoding  = iterTree(right); }
         else { encoding.put(right.n, right.biCode);
-            System.out.println("tree " + right.n + " right value " + encoding.get(right.n) + " isLeaf " + right.isLeaf);
+//            System.out.println("tree " + right.n + " right value " + encoding.get(right.n) + " isLeaf " + right.isLeaf);
         }
         return encoding;
     }
@@ -151,17 +149,12 @@ public class HuffmanCoding {
      * only 1 and 0.
      */
     public static String encode(String text) {
-//        Map<Character, String> encoding = constructTree(text);
-        System.out.println(text);
-        System.out.println("tree.root.childRight.childRight " + tree.root.childRight.childRight.n + " right value " + encoding.get(tree.root.childRight.n) + " isLeaf " + tree.root.childRight.isLeaf);
-
+        System.out.println(encoding.size() + " codeSet "  + encoding.entrySet());
         char[] T = text.toCharArray();
-        String code = "";
-
-
-//        for(char c : T){code = code + encoding.get(c); }
-        System.out.println(code);
-        return code;
+        StringBuilder code = new StringBuilder();
+        for(char c : T){code.append(encoding.get(c)); }
+//        System.out.println("Encoded " + code);
+        return code.toString();
     }
     
     /**
@@ -169,17 +162,6 @@ public class HuffmanCoding {
      * and return the decoded text as a text string.
      */
     public static String decode(String encoded) {
-
-        //        reverse the encoding Map to a decoding Map
-//        for (Map.Entry<Character, String> entry : encoding.entrySet()) {
-//            Character ch = (char)entry.getKey();
-//            String val = (String)entry.getValue();
-//
-//            //        create a second Map the reverse of the first
-//            decoding.put(val,ch);
-//        }
-//        System.out.println("Decoding " + decoding.entrySet());
-//        NodeHuff node = tree.root;
         StringBuilder decodedText = new StringBuilder();
         if (tree.root != null) {
             char[] E = encoded.toCharArray();
@@ -191,63 +173,30 @@ public class HuffmanCoding {
     private static StringBuilder iterTreeInverse(char[] E) {
         StringBuilder decodedText = new StringBuilder();
         String binary = "";
-        char zeroOne;
         NodeHuff node = tree.root;
-        System.out.println("Node root " + node.n + " binary code " + node.biCode + node.isLeaf);
-
-//        node <- root
-//        index <- 0
-//        while index < input.length:
-//        if input[index] == '0':
-//        node <- node.left
-//    else if input[index] == '1':
-//        node <- node.right
-//        if node is a leaf node:
-//        output node.character
-//        node <- root
-//        index++
-
 
         for (int i = 0; i < E.length; i++){
-            zeroOne = E[i];
-            System.out.println("Character in code " + zeroOne);
-            binary = Character.toString(zeroOne);
-            System.out.println("String of binary  " + binary);
+            binary = Character.toString(E[i]);
             if (binary.equals("0")) {
                 node = node.childLeft;
-                System.out.println("Node left " + node.n + " binary code " + node.biCode + node.isLeaf);
             } else { // binary.equals("1")
                 node = node.childRight;
-                System.out.println("Node right " + node.n + " binary code " + node.biCode + node.isLeaf);
             }
             if (node.isLeaf) {
                 decodedText.append(node.n);
                 node = tree.root;}
         }
-        System.out.println("Decoded " + decodedText.toString());
+//        System.out.println("Decoded " + decodedText.toString());
         return decodedText;
     }
-    //            else biCode += binary;
-//            if (encoding.containsValue(codedString)){
-//                codedString = "";
-//            }
+    //        Reversing the encoding Map to a decoding Map is O(N squared) -  takes way too long for the longer texts
+//        for (Map.Entry<Character, String> entry : encoding.entrySet()) {
+//            Character ch = (char)entry.getKey();
+//            String val = (String)entry.getValue();
+//
+//            //        create a second Map the reverse of the first
+//            decoding.put(val,ch);
 //        }
-
-//        NodeHuff left = node.childLeft;
-//        NodeHuff right = node.childRight;
-//        left.biCode = node.biCode + "0";
-//        right.biCode = node.biCode + "1";
-//        if(!left.isLeaf){
-//            encoding = iterTree(left, encoding); }
-//        else { encoding.put(left.node, left.biCode);
-////            System.out.println("tree " + left.node + " left value " + encoding.get(left.node) + " isLeaf " + left.isLeaf);
-//        }
-//        if(!right.isLeaf){
-//            encoding  = iterTree(right, encoding); }
-//        else { encoding.put(right.node, right.biCode);
-////            System.out.println("tree " + right.node + " right value " + encoding.get(right.node) + " isLeaf " + right.isLeaf);
-//        }
-//        return encoding;
-//    }
+//        System.out.println("Decoding " + decoding.entrySet());
 
 }
