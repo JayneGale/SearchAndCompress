@@ -143,6 +143,15 @@ public class HuffmanCoding {
         else if (charAscii >= 48 && charAscii <= 58) alphPriority = charAscii - 5; // charAscii 53 (10 + 26 + 26 + 1) - 48 digits next +
         else alphPriority = charAscii + 63 ; // 63 (10 + 26 + 26 + 1) - 30 punctuation after that
         return alphPriority;
+
+        //        TODO When time refactor alphabetical order to order of Character.compare
+//        char firstValue = 'a';
+//        char secondValue = 'A';
+//// compare the first char to the second
+//        int compareOneTwo = Character.compare(firstValue, secondValue);
+//        if (compareOneTwo> 0) { System.out.println("firstValue " + firstValue + " greater than second " + secondValue);}
+//        else {System.out.println("firstValue " + firstValue + " less than second " + secondValue);}
+
     }
 
     /**
