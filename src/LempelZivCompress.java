@@ -15,6 +15,7 @@ public class LempelZivCompress {
                 while (s.hasNextLine()) {
                     fileText.append(s.nextLine() + "\n");
                 }
+
                 System.out.println(compress(fileText.toString()));
             } catch (FileNotFoundException e) {
                 System.out.println("Unable to find file called " + args[0]);
@@ -27,7 +28,20 @@ public class LempelZivCompress {
      * text string.
      */
     public static String compress(String input) {
+
+//        Outputs a string of tuples:
+//– [offset, length, nextCharacter] or [0,0,character]
+        //        text.indexOf(pattern)
         // TODO (currently just returns the argument).
         return input;
     }
+//    public class LZivTriple<int offset, int len, char C> {
+//        public final int offset;
+//        public final int len;
+//
+//        public LZivTriple(int Offset, int len, char C) {
+//            this.x = x;
+//            this.y = y;
+//        }
+//    }
 }

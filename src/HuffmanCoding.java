@@ -38,6 +38,9 @@ public class HuffmanCoding {
 //                    Instant start = Instant.now();
                     constructTree(fileText.toString()); // initialises the tree field.
                     String codedText = encode(fileText.toString());
+                    System.out.println(encoding.entrySet());
+                    System.out.println(codedText);
+
                     // DO NOT just change this code to simply print fileText.toString() back. ;-)
                     System.out.println(decode(codedText));
 //                    Instant end = Instant.now();
@@ -68,9 +71,8 @@ public class HuffmanCoding {
 //        convert text to char array
         char[] T = text.toCharArray();
 
-        //        create method for finding frequency within the text and number of unique characters
+        // method for finding frequency within the text and number of unique characters
         HashMap<Character, Integer> cFreqMap = new HashMap<Character, Integer>();
-
 //        for each character in  text
 //        if freq = default start at 0, else add to count; store in character frequency Map
         for (char c : T) {
@@ -149,11 +151,9 @@ public class HuffmanCoding {
      * only 1 and 0.
      */
     public static String encode(String text) {
-        System.out.println(encoding.size() + " codeSet "  + encoding.entrySet());
         char[] T = text.toCharArray();
         StringBuilder code = new StringBuilder();
         for(char c : T){code.append(encoding.get(c)); }
-//        System.out.println("Encoded " + code);
         return code.toString();
     }
     
@@ -189,14 +189,11 @@ public class HuffmanCoding {
 //        System.out.println("Decoded " + decodedText.toString());
         return decodedText;
     }
-    //        Reversing the encoding Map to a decoding Map is O(N squared) -  takes way too long for the longer texts
+//        Reversing the encoding Map to a decoding Map is O(N squared) -  takes way too long for the longer texts
 //        for (Map.Entry<Character, String> entry : encoding.entrySet()) {
 //            Character ch = (char)entry.getKey();
 //            String val = (String)entry.getValue();
-//
-//            //        create a second Map the reverse of the first
+//            //create a second Map the reverse of the first
 //            decoding.put(val,ch);
 //        }
-//        System.out.println("Decoding " + decoding.entrySet());
-
 }

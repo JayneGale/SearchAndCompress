@@ -1,2 +1,1 @@
-AAABBB
-CCCDDD
+a contrived test containing riveting contrasting text\n
