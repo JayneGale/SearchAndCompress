@@ -15,7 +15,6 @@ public class LempelZivCompress {
                 while (s.hasNextLine()) {
                     fileText.append(s.nextLine() + "\n");
                 }
-
                 System.out.println(compress(fileText.toString()));
             } catch (FileNotFoundException e) {
                 System.out.println("Unable to find file called " + args[0]);

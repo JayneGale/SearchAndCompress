@@ -35,15 +35,15 @@ public class HuffmanCoding {
                     constructTree(fileText.toString()); // initialises the tree field.
                     System.out.println(encode(fileText.toString()));
                 } else if (args[1].equals("2")) {
-                    Instant start = Instant.now();
+//                    Instant start = Instant.now();
                     constructTree(fileText.toString()); // initialises the tree field.
                     String codedText = encode(fileText.toString());
                     // DO NOT just change this code to simply print fileText.toString() back. ;-)
                     System.out.println(decode(codedText));
-                    Instant end = Instant.now();
-                    Duration timeElapsed = Duration.between(start, end);
-                    double deltaT = (double) timeElapsed.toMillis() / 1000;
-                    System.out.println("Time taken: " + deltaT + " seconds");
+//                    Instant end = Instant.now();
+//                    Duration timeElapsed = Duration.between(start, end);
+//                    double deltaT = (double) timeElapsed.toMillis() / 1000;
+//                    System.out.println("Time taken: " + deltaT + " seconds");
 
                 } else {
                     System.out.println("Unknown second argument: should be 0 or 1 or 2");
