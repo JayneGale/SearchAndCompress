@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.util.regex.Pattern;
 
 public class LempelZivDecompress {
 
@@ -22,13 +23,32 @@ public class LempelZivDecompress {
             }
         }
     }
-    
+    static final Pattern OpenBracket = Pattern.compile("\\[");
+    static final Pattern BitOrPat = Pattern.compile("\\|");
+    static final Pattern CloseBracket = Pattern.compile("]");
+    static final Pattern Delimiters = Pattern.compile("\\[*\\|*]*");
     /**
      * Take compressed input as a text string, decompress it, and return it as a
      * text string.
      */
     public static String decompress(String compressed) {
-        // TODO (currently just returns the argument).
-        return compressed;
+        StringBuilder decompressed = new StringBuilder();
+        int cursor = 0;
+        Scanner s = new Scanner(compressed);
+        s.useDelimiter((Delimiters));
+        while (s.hasNext()){
+            System.out.println(decompressed.toString() + " " + s.toString());
+            StringBuilder sb = new StringBuilder();
+            int a = s.nextInt();
+            int b = s.nextInt();
+            if(a>0){
+                sb.append(decompressed.substring((cursor - a), (cursor + b - a)));
+            }
+            sb.append(s.next());
+            decompressed.append(sb);
+            System.out.println(decompressed.toString());
+        }
+        // TODO (look up the require methods etc from Assignment 4).
+        return decompressed.toString();
     }
 }

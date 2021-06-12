@@ -13,16 +13,22 @@ public class ZivTriple {
             return z;
         }
         public String toZString(ZivTriple z){
-            char ch = c.charAt(0);
+//            char ch = c.charAt(0);
             StringBuilder str = new StringBuilder("[");
             str.append(z.a);
             str.append("|");
             str.append(z.b);
             str.append("|");
-            if((int)c.charAt(0) ==10)str.append("newL");
-            else str.append(z.c);
+//            if((int)c.charAt(0) ==10)str.append("nL");
+//            else
+            str.append(z.c);
             str.append("]");
         return str.toString();
+        }
+        public ZivTriple decompressZ(String zString){
+
+
+            return new ZivTriple(zString.charAt(1),zString.charAt(3),Character.toString(zString.charAt(5)));
         }
     }
 
