@@ -12,14 +12,15 @@ public class ZivTriple {
             ZivTriple z = new ZivTriple(a,b,c);
             return z;
         }
-        public String toString(ZivTriple z){
+        public String toZString(ZivTriple z){
             StringBuilder str = new StringBuilder("[");
 //            str.append("[");
             str.append(z.a);
             str.append("|");
             str.append(z.b);
             str.append("|");
-            str.append(z.c);
+            if((int)c==10)str.append("newL");
+            else str.append(z.c);
             str.append("]");
         return str.toString();
         }
