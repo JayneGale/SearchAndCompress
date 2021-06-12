@@ -28,112 +28,76 @@ public class LempelZivCompress {
      * text string.
      */
     static final int windowSize = 100;
-
     public static String compress(String input) {
         int inputLen = input.length();
-        char[] text = input.toCharArray();
-        System.out.println("input string " + input + text.length);
         StringBuilder output = new StringBuilder();
+//      First character can have no match so just add that one;
+//        input.substring(windowStart,cursor),input.substring(cursor,Math.min(cursor+length,N));
+        ZivTriple first = new ZivTriple(0,0, input.substring(0,1));
+        output.append(first.toZString(first));
 
 //      LOOP 1: move through the whole text
-//      set start parameters
-        int cursor = 0; // position of char to be encoded ie text[0] to text [inputLen - 1]
+        int cursor = 1; // cursor = position index om T of char to be encoded ie text[1] to text [inputLen - 1]
         int length = 1;  // the length of the chars to be copied ie if length remains 1, no match. copy 0 chars
-        int maxLen = 1;
-        int prevMatch = 0; // starting index of the last match
-        int match = 0; // starting index of the match we are testing
-        while (cursor < 10) { // stay within the index bounds of text ? why -1  why not < inputLen?
-//        while (cursor < inputLen - 1) { // stay within the index bounds of text ? why -1  why not < inputLen?
-//          keep start of window index within size of text
-//            if (cursor - windowSize < 0)
-//                start = 0;// should never point before 0
-            int windowStart = (cursor < windowSize) ? 0 : cursor - windowSize;
+        int prevMatch = -1; // starting index in the text of the last match
+        int match = -1; // starting index of the match we are testing
+        int maxLen;
+        int windowStart;
 
-//          LOOP 2: start looking for the longest matches, starting from 1 = i
-//          loop through to find longest prefix of text from the cursor to the end of the text ie look ahead for longest prefix of text[cursor .. text.length-1]
+        while (cursor < inputLen) { // stay within text:  while (cursor < inputLen - 1) { // ? why -1  why not < inputLen?
+            windowStart = (cursor < windowSize) ? 0 : cursor - windowSize;
+//          LOOP: start looking for the longest matches, starting from 1 = i loop through to find longest prefix of text from the cursor to the end of the text ie look ahead for longest prefix of text[cursor .. text.length-1]don't look for matches that are longer than what is possible, either before or after the cursor (+- start and end of text)
+            // maximum limit to lookahead for this loop, maxLen = minimum of:(inputLen - 1) - cursor) OR (cursor - windowStart) because can't have a match longer than the window either
+            maxLen = Math.min((inputLen - cursor), (cursor - windowStart));
+//            if(cursor + length < inputLen){
+//                System.out.println("54 While cursor " + cursor + input.substring(cursor, (cursor+length)) + " maxLen " + maxLen + " length " + length);
+//            }
+            match = stringMatch(input.substring(cursor, (cursor + length)), input.substring(windowStart, cursor));
+            for (length = 1; length <= maxLen; length++) {
+                while (match >= 0) {
+                    prevMatch = match;
+                    length += 1;
+                    if(cursor+length>inputLen){match = -1; break;}
+//                    System.out.println("60 While MATCH cursor " + cursor + " " + input.substring(cursor, (cursor + length)) + " prevMatch " + prevMatch + " " + input.substring(prevMatch, (prevMatch + length)) + " length " + length);
+                    match = stringMatch(input.substring(cursor, (cursor + length)), input.substring(windowStart, cursor));
+                    if (length > maxLen) {match = -1; break;}
+                }
+                if(match < 0){break;}
+            }
+            if (match < 0) { // match < 0 no match
 
-//          don't look for matches that are longer than what is possible, either before or after the cursor (+- start and end of text)
-            // maximum limit to lookahead for this loop, maxLen = minimum of:
-            //      (inputLen - 1) - cursor) OR
-            //      (cursor - windowStart) because can't have a match longer than the window either
-//        in text[max(cursor-windowSize,0) .. cursor]
-
-
-//            initialise length and match for each new i
-            length = 1; // longest lookahead length match so far
-            prevMatch = 0; // longest match so far
-
-            for (int j = windowStart; j <= cursor; j++) {
-                maxLen = Math.min(inputLen - cursor, cursor + 1 - windowStart);
-                System.out.println("61 cursor " + cursor + text[cursor] + maxLen);
-
-                //          LOOP 3
-                while (length <= maxLen) {
-                    match = j;
-                    if(cursor>= inputLen){break;}
-                    System.out.println("71 cursor " + cursor + text[cursor] + " j " + j + text[match] + " length " + length);
-                    System.out.println("72 (match + length) " + (match + length - 1) + " (cursor + length - 1) " + (cursor + length - 1));
-
-                    if (text[match + length -1] == text[cursor + length -1]) { // if match succeeded, try a longer match
-                        prevMatch = match;
-                        System.out.println("76 match! cursor "  + cursor + text[cursor] + " j " + j + text[match + length -1] + length);
-                        length += 1;
-                        break;
-                    } else {
-                        ZivTriple next = new ZivTriple(prevMatch, length - 1, text[cursor + length - 1]);
-                        output.append(next.toZString(next));
-                        cursor += length;
-                        System.out.println("82 No match! " + j + text[j] + cursor + text[cursor] + length);
-                        length = 1;
+                if(prevMatch < 0){
+                    length = 1;
+//                    System.out.println("68 if no match no prevMatch " + cursor + input.substring(cursor, cursor + length)  + " length " + length);
+                    ZivTriple next = new ZivTriple(0, 0, input.substring(cursor, (cursor + 1)));
+                    output.append(next.toZString(next));
+                }
+                else if (prevMatch >=0){
+//                    System.out.println("74 NO MATCH prevMatch " + prevMatch + input.substring(prevMatch,(prevMatch + length)) + " cursor " + cursor + input.substring(cursor, (cursor+1)) + " length " + length + " windowStart " + windowStart);
+                    if((cursor + length) > inputLen){
+                        ZivTriple next = new ZivTriple((cursor - prevMatch - windowStart), (length - 2), input.substring((cursor + length - 2), (cursor + length -1)));
                         break;
                     }
+                    else {
+                        ZivTriple next = new ZivTriple((cursor - prevMatch - windowStart), (length - 1), input.substring((cursor + length - 1), (cursor + length)));
+                        output.append(next.toZString(next));
+                        prevMatch = -1; // longest match so far index of where it first matches
+                    }
                 }
-                if(match == cursor && cursor < inputLen){
-                    ZivTriple next = new ZivTriple(0, 0, text[cursor]);
-                    String str = next.toZString(next);
-                    System.out.println("92 next.toZString(next) " + str);
-                    output.append(next.toZString(next));
-                    cursor += 1;
-                    length = 1;
-                }
+//                if(cursor+length<inputLen) {
+//                    System.out.println("78 update cursor " + cursor + " text from cursor " + input.substring(cursor, (cursor + length)) + " to length" + length);
+//                }
+                cursor += length;
+                length = 1;
+                if (cursor > inputLen) { break; }
             }
         }
-        String encoded = output.toString();
-        // TODO (currently just returns the argument).
-        return encoded;
+        return output.toString();
+    }
+    public static int stringMatch(String fromCursor, String fromWindowStart){
+        int match = -1;
+        match = fromWindowStart.lastIndexOf(fromCursor);
+//        System.out.println("115 find fromCursor " + fromCursor + " in From WindowStart " + fromWindowStart + " match " + match);
+        return match;
     }
 }
-
-
-//        if found, add [offset,length,text[cursor+length]] to output
-//        else add [0|0|text[cursor]] to output
-
-//        advance cursor by length+1
-
-//                Todo match = stringMatch(text[cursor..cursor + length],
-//                Todo text[windowStart..cursor-1])
-//                if (match != 0) // need more in the loop; if match found, look for longer match
-//                {
-//                    ZivTriple next = new ZivTriple(prevMatch, length - 1, text[cursor + length - 1]);
-//                    output.append(next);
-//                    prevMatch = match;
-//                    length += 1;
-//                } else {
-//                    ZivTriple next = new ZivTriple(0, 0, text[cursor]);
-//                    output.append(next.toString());
-//                    cursor += length + 1; // move to the character in the input text that is after the match length
-//                }
-//                break;
-//            }
-
-//            This looks for an occurrence of text[cursor..cursor+length] in text[start..cursor-1], for
-//            increasing values of length, until none is found, then outputs a triple.
-//• This is pretty wasteful – we know there is no match before prevMatch, so there’s no
-//            point looking there again! Probably better starting from prevMatch?
-//• Or (maybe) find longest match starting at each position in window and record lo
-
-
-//   Output a string of tuples:
-//– [offset, length, nextCharacter] or [0|0|char]
-    //        text.indexOf(pattern)
-
