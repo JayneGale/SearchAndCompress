@@ -26,8 +26,6 @@ public class ZivTriple {
         return str.toString();
         }
         public ZivTriple decompressZ(String zString){
-
-
             return new ZivTriple(zString.charAt(1),zString.charAt(3),Character.toString(zString.charAt(5)));
         }
     }
