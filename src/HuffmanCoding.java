@@ -84,7 +84,8 @@ public class HuffmanCoding {
 //      Step 2         create the second (alphabet) priority based on ascii codes
             int charAscii = (int) entry.getKey();
 //            if (charAscii < 31 || charAscii == 127) break; // ignore control characters except newline
-            int alphPriority = setAlphabetPriority(charAscii);
+//            int alphPriority = setAlphabetPriority(charAscii);
+            int alphPriority = Character.valueOf(entry.getKey());
             //        create the Leaf nodes that contain a character and put each as a separate item in the forest of nodes
             NodeHuff c = new NodeHuff(entry.getKey(), entry.getValue(), alphPriority, null, null, null, true);
             forest.add(c);
