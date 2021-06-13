@@ -24,63 +24,84 @@ public class LempelZivDecompress {
         }
     }
 
-    static final Pattern OpenBracket = Pattern.compile("\\[");
-    static final Pattern BitOrPat = Pattern.compile("\\|");
-    static final Pattern CloseBracket = Pattern.compile("]");
-    static final Pattern Delimiters = Pattern.compile("\\[*\\|*]*");
-    private static final Pattern NUMPAT = Pattern.compile("-?[1-9][0-9]*|0");
 
     /**
      * Take compressed input as a text string, decompress it, and return it as a
      * text string.
      */
+    static final int maxLookahead = 30;
+    static final Pattern OpenBracket = Pattern.compile("\\[");
+    static final Pattern BitOrPat = Pattern.compile("\\|");
+    static final Pattern CloseBracket = Pattern.compile("]");
+    static final Pattern Delimiters = Pattern.compile("\\[|\\||]");
+    private static final Pattern NUMPAT = Pattern.compile("-?[1-9][0-9]*|0");
 
-    static ZivTriple parseFile(File compressedFile) {
-        Scanner scan = null;
-        try {
-            scan = new Scanner(compressedFile);
-            // the only time tokens can be next to each other is
-            // when one of them is one of (){},;
-//            scan.useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
-            scan.useDelimiter("\\s+|(?=[\\[]|[\\|]|[\\]])");
-//            scan.useDelimiter("\\s+|(?=["OpenBracket"]|["BitOrPat"]|["CloseBracket"])");
-
-            ZivTriple z = parseCompressed(scan); // You need to implement this!!!
-            scan.close();
-            return z;
-
-        } catch (FileNotFoundException e) {
-            System.out.println("Robot program source file not found");
-        } catch (ParserFailureException e) {
-            System.out.println("Parser error:");
-            System.out.println(e.getMessage());
-            scan.close();
-        }
-        return null;
-    }
-
-    public static ZivTriple parseCompressed(Scanner comprFile) {
-        return new ZivTriple(0, 0, "");
-    }
+//    static ZivTriple parseFile(File compressedFile) {
+//        Scanner scan = null;
+//        try {
+//            scan = new Scanner(compressedFile);
+//            // the only time tokens can be next to each other is
+//            // when one of them is one of (){},;
+////            scan.useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
+//            scan.useDelimiter("\\s+|(?=[\\[]|[\\|]|[\\]])");
+////            scan.useDelimiter("\\s+|(?=["OpenBracket"]|["BitOrPat"]|["CloseBracket"])");
+//
+//            ZivTriple z = parseCompressed(scan); // You need to implement this!!!
+//            scan.close();
+//            return z;
+//
+//        } catch (FileNotFoundException e) {
+//            System.out.println("Robot program source file not found");
+//        } catch (ParserFailureException e) {
+//            System.out.println("Parser error:");
+//            System.out.println(e.getMessage());
+//            scan.close();
+//        }
+//        return null;
+//    }
+//
+//    public static ZivTriple parseCompressed(Scanner comprFile) {
+//        return new ZivTriple(0, 0, "");
+//    }
 
     public static String decompress(String compressed) {
         StringBuilder decompressed = new StringBuilder();
+        int strLen = compressed.length();
         int cursor = 0;
-        Scanner s = new Scanner(compressed);
-        s.useDelimiter("\\s+|(?=[\\[]|[\\|]|[\\]])");
-//        s.useDelimiter((Delimiters));
-        while (s.hasNext()) {
-            System.out.println(decompressed.toString() + " " + s.toString());
+        int cursorAdd = 7;
+        ZivTriple z = new ZivTriple(0,0,"");
+        while((cursor + cursorAdd) <= strLen){
             StringBuilder sb = new StringBuilder();
-            int a = requireInt(NUMPAT, "no int ", s);
-            int b = requireInt(NUMPAT, "no int ", s);;
-            if (a > 0) {
-                sb.append(decompressed.substring((cursor - a), (cursor + b - a)));
+            String substr = compressed.substring(cursor, (cursor + cursorAdd));
+            z = z.decompressZ(substr);
+            int cursorDec = decompressed.length();
+            if (z.a > 0) {
+                int offset = cursorDec - z.a;
+                int length = offset + z.b;
+                System.out.println(decompressed.substring(offset,length));
+                sb.append(decompressed.substring(offset,length));
             }
-            sb.append(s.next());
+            sb.append(z.c);
             decompressed.append(sb);
-            System.out.println(decompressed.toString());
+            System.out.println(decompressed.toString() + " added " + sb.toString());
+            cursorAdd = 5 + String.valueOf(z.a).length() + String.valueOf(z.b).length();
+            cursor += cursorAdd;
+            System.out.println("cursor "+ cursor + " cursorAdd " + cursorAdd);
         }
+//        Scanner s = new Scanner(compressed);
+//        s.useDelimiter("\\s+|(?=[\\[]|[\\|]|[\\]])");
+//        s.useDelimiter((Delimiters));
+//        while (s.hasNext()) {
+//            System.out.println(decompressed.toString() + " " + s.toString());
+//            int a = requireInt(NUMPAT, "no int ", s);
+//            int b = requireInt(NUMPAT, "no int ", s);;
+//            if (a > 0) {
+//                sb.append(decompressed.substring((cursor - a), (cursor + b - a)));
+//            }
+//            sb.append(s.next());
+//            decompressed.append(sb);
+//            System.out.println(decompressed.toString());
+//        }
         return decompressed.toString();
     }
 

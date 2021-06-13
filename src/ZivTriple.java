@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class ZivTriple {
 
     int a;
@@ -26,7 +28,22 @@ public class ZivTriple {
         return str.toString();
         }
         public ZivTriple decompressZ(String zString){
-            return new ZivTriple(zString.charAt(1),zString.charAt(3),Character.toString(zString.charAt(5)));
+            Scanner s = new Scanner(zString);
+            s.useDelimiter("[\\[]|[\\|]|[\\]]");
+
+//            while(s.hasNext()){
+//                System.out.println("33 zTriple " + s.next());
+//            }
+            int aDec = s.nextInt();
+            int bDec = s.nextInt();
+            String cDec = s.next();
+            cDec = cDec.replace("]", "");
+            System.out.println("decompressZ " + " a " + aDec+ " b " + bDec + " c " + cDec);
+
+//            int aDec = Integer.parseInt(zString.substring(1));
+//            int bDec = Integer.parseInt(zString.substring(3,4));
+//            System.out.println("decompressZ " + aDec + bDec + zString.substring(5,6));
+            return new ZivTriple(aDec,bDec,cDec);
         }
     }
 
