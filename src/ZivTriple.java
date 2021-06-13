@@ -29,6 +29,7 @@ public class ZivTriple {
         }
         public ZivTriple decompressZ(String zString){
             Scanner s = new Scanner(zString);
+//            [[0-9]+\|[0-9]+\|.?\n?\]
             s.useDelimiter("[\\[]|[\\|]|[\\]]");
 
 //            while(s.hasNext()){

@@ -88,20 +88,27 @@ public class LempelZivDecompress {
             cursor += cursorAdd;
             System.out.println("cursor "+ cursor + " cursorAdd " + cursorAdd);
         }
-//        Scanner s = new Scanner(compressed);
-//        s.useDelimiter("\\s+|(?=[\\[]|[\\|]|[\\]])");
-//        s.useDelimiter((Delimiters));
-//        while (s.hasNext()) {
-//            System.out.println(decompressed.toString() + " " + s.toString());
-//            int a = requireInt(NUMPAT, "no int ", s);
-//            int b = requireInt(NUMPAT, "no int ", s);;
-//            if (a > 0) {
-//                sb.append(decompressed.substring((cursor - a), (cursor + b - a)));
-//            }
+        return decompressed.toString();
+    }
+
+    public static String decompressSc (String compressed) {
+        Scanner s = new Scanner(compressed);
+        s.useDelimiter("(?=[\\[]|[\\|]|[\\]])");
+
+        StringBuilder decompressed = new StringBuilder();
+        int cursor = 0;
+//        int strLen = compressed.length();
+        while (s.hasNext()) {
+            System.out.println(decompressed.toString() + " " + s.toString());
+            int a = requireInt(NUMPAT, "no int ", s);
+            int b = requireInt(NUMPAT, "no int ", s);;
+            if (a > 0) {
+                decompressed.append(decompressed.substring((cursor - a), (cursor + b - a)));
+            }
 //            sb.append(s.next());
-//            decompressed.append(sb);
-//            System.out.println(decompressed.toString());
-//        }
+            decompressed.append(s.next());
+            System.out.println(decompressed.toString());
+        }
         return decompressed.toString();
     }
 
