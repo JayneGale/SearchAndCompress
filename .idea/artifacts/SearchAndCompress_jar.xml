@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SearchAndCompress:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SearchAndCompress_jar</output-path>
+    <root id="archive" name="SearchAndCompress.jar">
+      <element id="module-output" name="SearchAndCompress" />
+    </root>
+  </artifact>
+</component>

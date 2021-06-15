@@ -34,7 +34,21 @@ public class BM {
      */
 
 //      pseudocode found at: http://personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/StringMatch/boyerMoore.htm
-//      goodSuffix code from https://iq.opengenus.org/boyer-moore-string-search-algorithm/
+    //    Compute function last
+//    i ← m-1
+//    j ← m-1
+//    Repeat
+//    If P[j] = T[i] then
+//        if j=0 then
+//            return i        // we have a match
+//        else
+//    i ← i -1
+//    j ← j -1
+//            else
+//    i ← i + m - Min(j, 1 + last[T[i]])
+//    j ← m -1
+//    until i > n -1
+//    Return "no match"
 
     public static int search(String text, String pattern) {
         char[] P = pattern.toCharArray();
@@ -45,16 +59,13 @@ public class BM {
         }
         for (char c : P){
             if(!charSet.contains(c)){ return -1;} //                if the character is not in the charSet of the text, there can be no match
-//            else { badSuffix.put(c, pattern.lastIndexOf(c));} // create the bad suffix table of the rightmost (last index of) the character in the pattern
         }
-//        HashMap<Character, Integer> badSuffix = new HashMap<>(); // don't need this as its a one liner (lastIndexOf)
         System.out.println(text.substring(0, 30) + " pattern " + pattern);
         int pLen = P.length;
         int tLen = T.length;
         int[] GS1 = goodSuffixTable(P);
         System.out.println("GD1 " + GS1);
 
-//        int[] GS2 = goodSuffixTable2(P);
         int iT = pLen-1; // index of where the pattern is moved to in the Text
         int iP = pLen-1; // index of how far through the pattern
         System.out.println("pLen " + pLen + " tLen " + tLen + " iT " + iT + " iP " + iP);
@@ -90,15 +101,18 @@ public class BM {
         return -1;
     }
 
+//   based on goodSuffix Python code from https://iq.opengenus.org/boyer-moore-string-search-algorithm/
+
     public static int[] goodSuffixTable(char[] P) {
 //        Each entry s[i] contains the shift distance of the pattern if a mismatch at position i – 1 occurs, i.e. if the suffix of the pattern starting at position i has matched.
         int pLen = P.length; // Pattern length
-        int[] borderPos = new int[pLen + 2]; //borderPos  the shift table
+        int[] borderPos = new int[pLen + 2]; //borderPos is the position of the bordres of the suffix
         int[] shift1 = new int[pLen + 1];
+//        think initialising int arrays to 0 in not necessary in Java
         Arrays.fill(shift1, 0, pLen + 1, 0);
 
-        int i = pLen;
-        int j = pLen + 1; //position in prefix
+        int i = pLen; // start at the end of the pattern
+        int j = pLen + 1; // border exceeds the pattern
         System.out.println("end loop i  and j" + i + j);
 
         while (i > 0) {
@@ -120,56 +134,4 @@ public class BM {
             }
         return shift1;
     }
-
-//        int pos = pLen - 2;  // the index of borderPos table .. already have pos 0 and 1
-//        while(pos < pLen){
-//            if (P[pos - 1] == P[j]) { // substrings pos -1 and 0-j match
-//                borderPos[pos] = j+1;
-//                pos++;
-//                j++;
-//            }
-//            else if(j <= 0){
-//                j = borderPos[j]; // mismatch, restart the prefix
-//            }
-//            else{ //ie j= 0, the matching prefix is 0 long
-//                borderPos[pos] = 0;
-//                pos++;
-//            }
-//        }
-//        return borderPos;
-//    }
-
-    public static int[] goodSuffixTable2(char[] P)
-    {
-        int pLen = P.length;
-        int[] F = new int[pLen]; // m
-        int i, j;
-        j = F[0]; //??
-        for (i=0; i<=pLen; i++)
-        {
-//            if (GS1.get(i)==0) { GS1.set(i)=j; }
-//            if (i==j) { j=F[j]; }
-        }
-        return F;
-    }
-
-//    public static int last(char c, String P){
-//        return P.lastIndexOf(c);
-//    }
-
-//    Compute function last
-//    i ← m-1
-//    j ← m-1
-//    Repeat
-//    If P[j] = T[i] then
-//        if j=0 then
-//            return i        // we have a match
-//        else
-//    i ← i -1
-//    j ← j -1
-//            else
-//    i ← i + m - Min(j, 1 + last[T[i]])
-//    j ← m -1
-//    until i > n -1
-//    Return "no match"
 }
